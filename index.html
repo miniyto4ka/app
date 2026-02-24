@@ -3,49 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zoom App</title>
-    <!-- Подключаем стили PhotoSwipe -->
+    <title>TG Photo Viewer</title>
+    <!-- Подключаем стили для зума и свайпов -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com">
     <script src="https://telegram.org"></script>
     <style>
-        body {
-            margin: 0; background: #000;
-            display: flex; align-items: center; justify-content: center;
-            height: 100vh; overflow: hidden;
-        }
-        /* Стиль для картинки-превью */
-        #gallery-link img {
-            width: 90vw; max-height: 80vh;
-            object-fit: contain; border-radius: 10px;
-        }
+        body { margin: 0; background: #000; height: 100vh; overflow: hidden; }
+        /* Контейнер для картинки на весь экран */
+        #gallery { display: none; }
+        .pswp { --pswp-bg: #000; }
     </style>
 </head>
 <body>
 
-    <!-- Ссылка, по клику на которую откроется зум -->
-    <a href="my_photo.jpg" 
-       id="gallery-link"
-       data-pswp-width="1200" 
-       data-pswp-height="1600" 
-       target="_blank">
-        <img src="IMG_20260224_223131_528.jpg" alt="Нажми, чтобы увеличить" />
-    </a>
+    <!-- УКАЖИТЕ ИМЯ ВАШЕЙ КАРТИНКИ ВМЕСТЕ С .JPG ИЛИ .PNG В ДВУХ МЕСТАХ НИЖЕ -->
+    <div id="gallery">
+      <a href="IMG_20260224_223131_528.jpg" 
+         data-pswp-width="1200" 
+         data-pswp-height="1600" 
+         id="target-link">
+        <img src="IMG_20260224_223131_528.jpg" alt="Photo" />
+      </a>
+    </div>
 
     <script type="module">
         import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com';
         
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); // Раскрываем мини-апп на максимум
+        tg.enableClosingConfirmation(); // Чтобы случайно не закрыть свайпом
 
-        // Инициализируем читалку картинок
         const lightbox = new PhotoSwipeLightbox({
-            gallery: '#gallery-link',
-            pswpModule: () => import('https://cdnjs.cloudflare.com')
+            gallery: '#gallery',
+            children: 'a',
+            pswpModule: () => import('https://cdnjs.cloudflare.com'),
+            // Настройки для свободного движения:
+            initialZoomLevel: 'fit',
+            secondaryZoomLevel: 2.5, // Увеличение при двойном тапе
+            maxZoomLevel: 5,        // Максимальный зум пальцами
+            wheelToZoom: true       // Позволяет зумить колесиком (если с ПК)
         });
+
         lightbox.init();
 
-        // Автоматически «кликаем» по картинке, чтобы зум открылся сразу
-        document.getElementById('gallery-link').click();
+        // Авто-запуск галереи при открытии приложения
+        window.onload = () => {
+            const link = document.getElementById('target-link');
+            if (link) link.click();
+        };
+
+        // Обработка кнопки "Назад" в Телеграм, чтобы закрывать зум, а не всё приложение
+        tg.BackButton.onClick(() => {
+            lightbox.pswp.close();
+        });
+
+        lightbox.on('afterInit', () => {
+            tg.BackButton.show();
+        });
+
+        lightbox.on('destroy', () => {
+            tg.BackButton.hide();
+        });
     </script>
 </body>
 </html>
