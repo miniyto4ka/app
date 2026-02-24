@@ -2,64 +2,45 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- ВАЖНО: разрешаем масштабирование (user-scalable=yes) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Zoom Fix</title>
+    <title>Исправление Zoom</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com">
     <script src="https://telegram.org"></script>
     <style>
-        body { margin: 0; background: #000; height: 100vh; overflow: hidden; touch-action: none; }
-        #gallery { display: none; }
+        body { margin: 0; background: #000; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        img { width: 100%; max-height: 100vh; object-fit: contain; }
+        #gallery { width: 100%; height: 100%; }
     </style>
 </head>
 <body>
 
     <div id="gallery">
-      <!-- ЗАМЕНИТЕ my_photo.jpg НА ВАШЕ ИМЯ ФАЙЛА -->
-      <a href="IMG_20260224_223131_528.jpg" 
-         data-pswp-width="1500" 
-         data-pswp-height="2500" 
-         id="target-link">
-        <img src="IMG_20260224_223131_528.jpg" alt="Photo" />
-      </a>
+        <a href="IMG_20260224_223131_528.jpg" 
+           data-pswp-width="1500" 
+           data-pswp-height="2500" 
+           id="target-link">
+            <img src="IMG_20260224_223131_528.jpg" alt="Фото" />
+        </a>
     </div>
 
     <script type="module">
         import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com';
-        
         const tg = window.Telegram.WebApp;
-        tg.expand(); 
-        
-        // Эта настройка ОЧЕНЬ важна для зума в Telegram
-        tg.isVerticalSwipesEnabled = false; 
+        tg.expand();
 
         const lightbox = new PhotoSwipeLightbox({
             gallery: '#gallery',
             children: 'a',
             pswpModule: () => import('https://cdnjs.cloudflare.com'),
             initialZoomLevel: 'fit',
-            secondaryZoomLevel: 3, 
-            maxZoomLevel: 6,
-            // Отключаем закрытие свайпом, чтобы не мешало двигать фото
-            closeOnVerticalDrag: false 
+            secondaryZoomLevel: 3,
+            maxZoomLevel: 6
         });
-
         lightbox.init();
 
-        // Форсируем открытие при загрузке
         window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('target-link').click();
-            }, 50);
+            setTimeout(() => { document.getElementById('target-link').click(); }, 100);
         };
-
-        // Кнопка "Назад" закроет только просмотр фото
-        tg.BackButton.onClick(() => {
-            if (lightbox.pswp) lightbox.pswp.close();
-        });
-
-        lightbox.on('afterInit', () => tg.BackButton.show());
-        lightbox.on('destroy', () => tg.BackButton.hide());
     </script>
 </body>
 </html>
