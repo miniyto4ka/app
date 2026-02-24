@@ -2,50 +2,50 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Mini App Image</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zoom App</title>
+    <!-- Подключаем стили PhotoSwipe -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com">
     <script src="https://telegram.org"></script>
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--tg-theme-bg-color, #000);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
+            margin: 0; background: #000;
+            display: flex; align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden;
         }
-        .main-img {
-            width: 90%; /* Ширина картинки */
-            max-width: 400px;
-            border-radius: 20px; /* Скругленные углы */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .user-text {
-            color: var(--tg-theme-text-color, #fff);
-            margin-top: 20px;
-            font-family: sans-serif;
-            font-weight: bold;
+        /* Стиль для картинки-превью */
+        #gallery-link img {
+            width: 90vw; max-height: 80vh;
+            object-fit: contain; border-radius: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- ЗАМЕНИТЕ ССЫЛКУ НИЖЕ НА ВАШУ КАРТИНКУ -->
-    <img src="IMG_20260224_223131_528.jpg" class="main-img" alt="Приложение">
+    <!-- Ссылка, по клику на которую откроется зум -->
+    <a href="my_photo.jpg" 
+       id="gallery-link"
+       data-pswp-width="1200" 
+       data-pswp-height="1600" 
+       target="_blank">
+        <img src="IMG_20260224_223131_528.jpg" alt="Нажми, чтобы увеличить" />
+    </a>
 
-    <div class="user-text" id="username"></div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
+    <script type="module">
+        import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com';
         
-        // Показываем имя пользователя из Телеграм
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('username').innerText = "Привет, " + tg.initDataUnsafe.user.first_name;
-        }
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Инициализируем читалку картинок
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '#gallery-link',
+            pswpModule: () => import('https://cdnjs.cloudflare.com')
+        });
+        lightbox.init();
+
+        // Автоматически «кликаем» по картинке, чтобы зум открылся сразу
+        document.getElementById('gallery-link').click();
     </script>
 </body>
 </html>
