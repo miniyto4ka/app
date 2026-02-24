@@ -2,25 +2,23 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TG Photo Viewer</title>
-    <!-- Подключаем стили для зума и свайпов -->
+    <!-- ВАЖНО: разрешаем масштабирование (user-scalable=yes) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Zoom Fix</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com">
     <script src="https://telegram.org"></script>
     <style>
-        body { margin: 0; background: #000; height: 100vh; overflow: hidden; }
-        /* Контейнер для картинки на весь экран */
+        body { margin: 0; background: #000; height: 100vh; overflow: hidden; touch-action: none; }
         #gallery { display: none; }
-        .pswp { --pswp-bg: #000; }
     </style>
 </head>
 <body>
 
-    <!-- УКАЖИТЕ ИМЯ ВАШЕЙ КАРТИНКИ ВМЕСТЕ С .JPG ИЛИ .PNG В ДВУХ МЕСТАХ НИЖЕ -->
     <div id="gallery">
+      <!-- ЗАМЕНИТЕ my_photo.jpg НА ВАШЕ ИМЯ ФАЙЛА -->
       <a href="IMG_20260224_223131_528.jpg" 
-         data-pswp-width="1200" 
-         data-pswp-height="1600" 
+         data-pswp-width="1500" 
+         data-pswp-height="2500" 
          id="target-link">
         <img src="IMG_20260224_223131_528.jpg" alt="Photo" />
       </a>
@@ -30,40 +28,38 @@
         import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com';
         
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Раскрываем мини-апп на максимум
-        tg.enableClosingConfirmation(); // Чтобы случайно не закрыть свайпом
+        tg.expand(); 
+        
+        // Эта настройка ОЧЕНЬ важна для зума в Telegram
+        tg.isVerticalSwipesEnabled = false; 
 
         const lightbox = new PhotoSwipeLightbox({
             gallery: '#gallery',
             children: 'a',
             pswpModule: () => import('https://cdnjs.cloudflare.com'),
-            // Настройки для свободного движения:
             initialZoomLevel: 'fit',
-            secondaryZoomLevel: 2.5, // Увеличение при двойном тапе
-            maxZoomLevel: 5,        // Максимальный зум пальцами
-            wheelToZoom: true       // Позволяет зумить колесиком (если с ПК)
+            secondaryZoomLevel: 3, 
+            maxZoomLevel: 6,
+            // Отключаем закрытие свайпом, чтобы не мешало двигать фото
+            closeOnVerticalDrag: false 
         });
 
         lightbox.init();
 
-        // Авто-запуск галереи при открытии приложения
+        // Форсируем открытие при загрузке
         window.onload = () => {
-            const link = document.getElementById('target-link');
-            if (link) link.click();
+            setTimeout(() => {
+                document.getElementById('target-link').click();
+            }, 50);
         };
 
-        // Обработка кнопки "Назад" в Телеграм, чтобы закрывать зум, а не всё приложение
+        // Кнопка "Назад" закроет только просмотр фото
         tg.BackButton.onClick(() => {
-            lightbox.pswp.close();
+            if (lightbox.pswp) lightbox.pswp.close();
         });
 
-        lightbox.on('afterInit', () => {
-            tg.BackButton.show();
-        });
-
-        lightbox.on('destroy', () => {
-            tg.BackButton.hide();
-        });
+        lightbox.on('afterInit', () => tg.BackButton.show());
+        lightbox.on('destroy', () => tg.BackButton.hide());
     </script>
 </body>
 </html>
