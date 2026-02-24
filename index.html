@@ -2,59 +2,49 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Telegram Mini App</title>
-    <!-- Подключаем скрипт Телеграма -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mini App Image</title>
     <script src="https://telegram.org"></script>
     <style>
         body {
-            font-family: sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            margin: 0;
+            padding: 0;
+            background-color: var(--tg-theme-bg-color, #000);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
+            overflow: hidden;
         }
-        img {
-            width: 200px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+        .main-img {
+            width: 90%; /* Ширина картинки */
+            max-width: 400px;
+            border-radius: 20px; /* Скругленные углы */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        button {
-            padding: 10px 20px;
-            background-color: var(--tg-theme-button-color, #248bed);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+        .user-text {
+            color: var(--tg-theme-text-color, #fff);
+            margin-top: 20px;
+            font-family: sans-serif;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- Ваша картинка внутри приложения -->
-    <img src="https://via.placeholder.com" alt="App Image">
-    
-    <h1 id="user-name">Привет!</h1>
-    <p>Это твое мини-приложение в группе.</p>
+    <!-- ЗАМЕНИТЕ ССЫЛКУ НИЖЕ НА ВАШУ КАРТИНКУ -->
+    <img src="https://picsum.photos" class="main-img" alt="Приложение">
 
-    <button onclick="closeApp()">Закрыть приложение</button>
+    <div class="user-text" id="username"></div>
 
     <script>
-        // Инициализация WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на все окно
-
-        // Отображаем имя пользователя, если оно есть
+        tg.expand(); // Развернуть на весь экран
+        
+        // Показываем имя пользователя из Телеграм
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('user-name').innerText = Привет, ${tg.initDataUnsafe.user.first_name}!;
-        }
-
-        function closeApp() {
-            tg.close(); // Закрыть мини-апп
+            document.getElementById('username').innerText = "Привет, " + tg.initDataUnsafe.user.first_name;
         }
     </script>
 </body>
